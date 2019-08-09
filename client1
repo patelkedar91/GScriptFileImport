@@ -1,0 +1,71 @@
+var SS = SpreadsheetApp.getActiveSpreadsheet();
+var SSurl = SpreadsheetApp.getActive().getSheetByName('Menu');
+var SSComms = SpreadsheetApp.getActive().getActiveSheet();
+var spreadsheetId =  SpreadsheetApp.getActiveSpreadsheet().getId();
+var spreadsheetFile =  DriveApp.getFileById(spreadsheetId);
+var fIDPar = spreadsheetFile.getParents().next().getId();
+var fIDChi = spreadsheetFile.getParents().next().getFoldersByName('_Testing Fund').next().getFolders().next().getId();
+var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+
+
+/* Clears out all the files */
+
+function ClearOutFiles() {
+SSurl.getRange('D10:E25').clearContent();
+}
+
+
+function getFileArray(folderId){
+var folder = DriveApp.getFolderById(folderId);
+var files = folder.getFiles();
+var fileList = [];
+
+
+//Loop though files and add names and urls to the array
+  
+while (files.hasNext()){
+var file = files.next();
+var fileName = file.getName();
+var fileUrl = file.getUrl();
+fileList = fileList.concat([[fileName, fileUrl]]);
+}
+  
+  
+//See returned fileList in a log
+  
+return fileList
+}
+
+
+//Prints any 2D array to a range that starts with the selected cell
+
+function printArrayToSelection(twoDimArr){
+var firstCell = SS.getRange('D21')
+var lastCell = firstCell.offset(twoDimArr.length - 1, twoDimArr[0].length - 1);
+var destinationRange = SSurl.getRange(
+firstCell.getA1Notation() + ':' + lastCell.getA1Notation());
+destinationRange.setValues(twoDimArr);
+}
+function printChildArrayToSelection(twoDimArr){
+var firstCell = SSurl.getRange('D10')
+var lastCell = firstCell.offset(twoDimArr.length - 1, twoDimArr[0].length - 1);
+var destinationRange = SSurl.getRange(
+firstCell.getA1Notation() + ':' + lastCell.getA1Notation());
+destinationRange.setValues(twoDimArr);
+}
+
+
+//Print the parent folder data
+
+function printFileArray(){
+printChildArrayToSelection(getFileArray(fIDChi));
+}
+
+
+// Takes you to the analytics sheet
+function goTo() {
+// Returns the current highlighted cell in the one of the active ranges.
+// var currentCell = sheet.getCurrentCell().getValue();
+// SpreadsheetApp.getActiveSpreadsheet().getSheetByName(currentCell).activate();
+  SpreadsheetApp.getActiveSpreadsheet().getSheetByName('1 - Analytics').activate();
+}
